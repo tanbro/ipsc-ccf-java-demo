@@ -56,7 +56,7 @@ public class Main {
                         String fullMethodName = rpcRequest.getMethod();
                         if (fullMethodName.startsWith("sys.call")) {
                             /// 呼叫事件
-                            String methodName = fullMethodName.substring(8);
+                            String methodName = fullMethodName.substring(9);
                             final String callId = (String) rpcRequest.getParams().get("res_id");
                             if (methodName.equals("on_released")) {
                                 logger.warn("呼叫 {} 已经释放", callId);
@@ -102,7 +102,7 @@ public class Main {
                             }
                         } else if (fullMethodName.startsWith("sys.conf")) {
                             /// 会议事件
-                            String methodName = fullMethodName.substring(8);
+                            String methodName = fullMethodName.substring(9);
                             String confId = (String) rpcRequest.getParams().get("res_id");
                             if (methodName.equals("on_released")) {
                                 logger.warn("会议 {} 已经释放", confId);
