@@ -7,7 +7,7 @@ import com.hesong.ipsc.ccf.*;
 /**
  * Created by tanbr on 2017/5/10.
  */
-public class MainClass {
+public class Main {
 
     private static String ipscIpAddr = "192.168.2.100"; /// IPSC 服务器的内网地址
     private static byte localId = 24;
