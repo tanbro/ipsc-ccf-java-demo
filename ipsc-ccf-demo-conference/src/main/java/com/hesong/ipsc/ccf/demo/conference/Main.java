@@ -34,11 +34,11 @@ public class Main {
             }
 
             public void connectFailed(Client client, int i) {
-                System.out.format("[%d] 连接失败", client.getId());
+                System.out.format("[{}] 连接失败", client.getId());
             }
 
             public void connectLost(Client client) {
-                System.out.format("[%d] 连接丢失", client.getId());
+                System.out.format("[{}] 连接丢失", client.getId());
             }
 
             public void globalConnectStateChanged(byte b, byte b1, byte b2, byte b3, String s) {
@@ -59,13 +59,13 @@ public class Main {
                             String methodName = fullMethodName.substring(8);
                             final String callId = (String) rpcRequest.getParams().get("res_id");
                             if (methodName.equals("on_released")) {
-                                logger.warn("呼叫 %s 已经释放", callId);
+                                logger.warn("呼叫 {} 已经释放", callId);
                             } else if (methodName.equals("on_ringing")) {
-                                logger.info("呼叫 %s 振铃", callId);
+                                logger.info("呼叫 {} 振铃", callId);
                             } else if (methodName.equals("on_dial_completed")) {
                                 String error = (String) rpcRequest.getParams().get("error");
                                 if (error == null) {
-                                    logger.info("呼叫 %s 拨号成功，操作呼叫资源，让它加入会议 %s ...", callId, conferenceId);
+                                    logger.info("呼叫 {} 拨号成功，操作呼叫资源，让它加入会议 {} ...", callId, conferenceId);
                                     try {
                                         Map<String, Object> params = new HashMap<String, Object>();
                                         params.put("res_id", callId);
@@ -79,17 +79,17 @@ public class Main {
                                                 new RpcResultListener() {
                                                     @Override
                                                     protected void onResult(Object o) {
-                                                        logger.info("呼叫 %s 加入会议 %s 操作完毕", callId, conferenceId);
+                                                        logger.info("呼叫 {} 加入会议 {} 操作完毕", callId, conferenceId);
                                                     }
 
                                                     @Override
                                                     protected void onError(RpcError rpcError) {
-                                                        logger.error("呼叫 %s 加入会议 %s 操作错误: %s", callId, conferenceId, rpcError.getMessage());
+                                                        logger.error("呼叫 {} 加入会议 {} 操作错误: {}", callId, conferenceId, rpcError.getMessage());
                                                     }
 
                                                     @Override
                                                     protected void onTimeout() {
-                                                        logger.error("呼叫 %s 加入会议 %s 操作超时无响应", callId, conferenceId);
+                                                        logger.error("呼叫 {} 加入会议 {} 操作超时无响应", callId, conferenceId);
                                                     }
                                                 }
                                         );
@@ -97,7 +97,7 @@ public class Main {
                                         e.printStackTrace();
                                     }
                                 } else {
-                                    logger.error("呼叫 %s 拨号失败：%s", callId, error);
+                                    logger.error("呼叫 {} 拨号失败：{}", callId, error);
                                 }
                             }
                         } else if (fullMethodName.startsWith("sys.conf")) {
@@ -105,7 +105,7 @@ public class Main {
                             String methodName = fullMethodName.substring(8);
                             String confId = (String) rpcRequest.getParams().get("res_id");
                             if (methodName.equals("on_released")) {
-                                logger.warn("会议 %s 已经释放", confId);
+                                logger.warn("会议 {} 已经释放", confId);
                                 if (confId.equals(conferenceId)) {
                                     conferenceId = "";
                                 }
@@ -139,12 +139,12 @@ public class Main {
                             protected void onResult(Object o) {
                                 Map<String, Object> result = (Map<String, Object>) o;
                                 conferenceId = (String) result.get("res_id");
-                                logger.info("会议资源建立成功，ID=%s", conferenceId);
+                                logger.info("会议资源建立成功，ID={}", conferenceId);
                             }
 
                             @Override
                             protected void onError(RpcError rpcError) {
-                                logger.error("创建会议资源错误：%d %s", rpcError.getCode(), rpcError.getMessage());
+                                logger.error("创建会议资源错误：{} {}", rpcError.getCode(), rpcError.getMessage());
                             }
 
                             @Override
@@ -155,7 +155,7 @@ public class Main {
                 );
             } else if (inputStr.startsWith("call")) {
                 String tel = inputStr.substring(4).trim();
-                logger.info("呼叫 %s", tel);
+                logger.info("呼叫 {}", tel);
                 Map<String, Object> params = new HashMap<String, Object>();
                 params.put("to_uri", tel); /// 被叫号码的 SIP URI
                 params.put("max_answer_seconds", 300); /// 该呼叫最长通话允许时间
@@ -168,12 +168,12 @@ public class Main {
                             protected void onResult(Object o) {
                                 Map<String, Object> result = (Map<String, Object>) o;
                                 String callId = (String) result.get("res_id");
-                                logger.info("呼叫资源建立成功，ID=%s。系统正在执行外呼……注意这不是呼叫成功！", callId);
+                                logger.info("呼叫资源建立成功，ID={}。系统正在执行外呼……注意这不是呼叫成功！", callId);
                             }
 
                             @Override
                             protected void onError(RpcError rpcError) {
-                                logger.error("创建呼叫资源错误：%d %s", rpcError.getCode(), rpcError.getMessage());
+                                logger.error("创建呼叫资源错误：{} {}", rpcError.getCode(), rpcError.getMessage());
                             }
 
                             @Override
