@@ -27,12 +27,6 @@
                 <configuration>
                     <mainClass>com.hesong.ipsc.ccf.demo.conference.Main</mainClass>
                     <classpathScope>compile</classpathScope>
-                    <systemProperties>
-                        <systemProperty>
-                            <key>java.library.path</key>
-                            <value>/usr/local/lib</value>
-                        </systemProperty>
-                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>
