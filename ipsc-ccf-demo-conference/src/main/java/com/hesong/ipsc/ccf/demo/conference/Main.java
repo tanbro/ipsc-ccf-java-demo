@@ -22,7 +22,7 @@ public class Main {
     private static final byte commanderId = 10;
 
     private static Commander commander = null;
-    private static String conferenceId = "";
+    private static String conferenceId = null;
     private static BusAddress busAddress = null;
 
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -108,7 +108,7 @@ public class Main {
         while (true) {
             inputStr = scanner.nextLine().trim().toLowerCase();
             if (inputStr.equals("conf")) {
-                if (!conferenceId.isEmpty()) {
+                if (conferenceId != null) {
                     logger.warn("这个DEMO就写了一个会议，别新建多个！");
                     continue;
                 }
