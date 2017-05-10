@@ -22,7 +22,7 @@ public class Main {
     private static final byte commanderId = 10;
 
     private static Commander commander = null;
-    private static String conferenceId = null;
+    private static String conferenceId = "";
     private static BusAddress busAddress = null;
 
     public static void main(String[] args) throws InterruptedException, IOException {
@@ -47,57 +47,72 @@ public class Main {
         });
 
         /// 新建一个命令发送者
-        commander = Unit.createCommander(commanderId, ipscIpAddr, new RpcEventListener() {
-            public void onEvent(BusAddress busAddress, RpcRequest rpcRequest) {
-                String fullMethodName = rpcRequest.getMethod();
-                if (fullMethodName.startsWith("sys.call")) {
-                    String methodName = fullMethodName.substring(8);
-                    final String callId = (String) rpcRequest.getParams().get("res_id");
-                    if (methodName.equals("on_released")) {
-                        logger.warn("呼叫 %s 已经释放", callId);
-                    } else if (methodName.equals("on_ringing")) {
-                        logger.info("呼叫 %s 振铃", callId);
-                    } else if (methodName.equals("on_dial_completed")) {
-                        String error = (String) rpcRequest.getParams().get("error");
-                        if (error == null) {
-                            logger.info("呼叫 %s 拨号成功，操作呼叫资源，让它加入会议 %s ...", callId, conferenceId);
-                            try {
-                                Map<String, Object> params = new HashMap<String, Object>();
-                                params.put("res_id", callId);
-                                params.put("conf_res_id", conferenceId);
-                                params.put("max_seconds", 300);
-                                commander.operateResource(
-                                        busAddress,
-                                        UUID.randomUUID().toString(),
-                                        "sys.call.conf_enter",
-                                        params,
-                                        new RpcResultListener() {
-                                            @Override
-                                            protected void onResult(Object o) {
-                                                logger.info("呼叫 %s 加入会议 %s 操作完毕", callId, conferenceId);
-                                            }
+        commander = Unit.createCommander(
+                commanderId,
+                ipscIpAddr,
+                /// 事件监听器
+                new RpcEventListener() {
+                    public void onEvent(BusAddress busAddress, RpcRequest rpcRequest) {
+                        String fullMethodName = rpcRequest.getMethod();
+                        if (fullMethodName.startsWith("sys.call")) {
+                            /// 呼叫事件
+                            String methodName = fullMethodName.substring(8);
+                            final String callId = (String) rpcRequest.getParams().get("res_id");
+                            if (methodName.equals("on_released")) {
+                                logger.warn("呼叫 %s 已经释放", callId);
+                            } else if (methodName.equals("on_ringing")) {
+                                logger.info("呼叫 %s 振铃", callId);
+                            } else if (methodName.equals("on_dial_completed")) {
+                                String error = (String) rpcRequest.getParams().get("error");
+                                if (error == null) {
+                                    logger.info("呼叫 %s 拨号成功，操作呼叫资源，让它加入会议 %s ...", callId, conferenceId);
+                                    try {
+                                        Map<String, Object> params = new HashMap<String, Object>();
+                                        params.put("res_id", callId);
+                                        params.put("conf_res_id", conferenceId);
+                                        params.put("max_seconds", 300);
+                                        commander.operateResource(
+                                                busAddress,
+                                                UUID.randomUUID().toString(),
+                                                "sys.call.conf_enter",
+                                                params,
+                                                new RpcResultListener() {
+                                                    @Override
+                                                    protected void onResult(Object o) {
+                                                        logger.info("呼叫 %s 加入会议 %s 操作完毕", callId, conferenceId);
+                                                    }
 
-                                            @Override
-                                            protected void onError(RpcError rpcError) {
-                                                logger.error("呼叫 %s 加入会议 %s 操作错误: %s", callId, conferenceId, rpcError.getMessage());
-                                            }
+                                                    @Override
+                                                    protected void onError(RpcError rpcError) {
+                                                        logger.error("呼叫 %s 加入会议 %s 操作错误: %s", callId, conferenceId, rpcError.getMessage());
+                                                    }
 
-                                            @Override
-                                            protected void onTimeout() {
-                                                logger.error("呼叫 %s 加入会议 %s 操作超时无响应", callId, conferenceId);
-                                            }
-                                        }
-                                );
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                                                    @Override
+                                                    protected void onTimeout() {
+                                                        logger.error("呼叫 %s 加入会议 %s 操作超时无响应", callId, conferenceId);
+                                                    }
+                                                }
+                                        );
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    logger.error("呼叫 %s 拨号失败：%s", callId, error);
+                                }
                             }
-                        } else {
-                            logger.error("呼叫 %s 拨号失败：%s", callId, error);
+                        } else if (fullMethodName.startsWith("sys.conf")) {
+                            /// 会议事件
+                            String methodName = fullMethodName.substring(8);
+                            String confId = (String) rpcRequest.getParams().get("res_id");
+                            if (methodName.equals("on_released")) {
+                                logger.warn("会议 %s 已经释放", confId);
+                                if (confId.equals(conferenceId)) {
+                                    conferenceId = "";
+                                }
+                            }
                         }
                     }
-                }
-            }
-        });
+                });
 
         /// 开始执行
         String inputStr;
@@ -108,7 +123,7 @@ public class Main {
         while (true) {
             inputStr = scanner.nextLine().trim().toLowerCase();
             if (inputStr.equals("conf")) {
-                if (conferenceId != null) {
+                if (!conferenceId.isEmpty()) {
                     logger.warn("这个DEMO就写了一个会议，别新建多个！");
                     continue;
                 }
