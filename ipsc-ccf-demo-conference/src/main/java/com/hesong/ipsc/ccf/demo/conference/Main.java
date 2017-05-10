@@ -21,9 +21,9 @@ public class Main {
     private static final byte localId = 24;
     private static final byte commanderId = 10;
 
-    private static Commander commander;
-    private static String conferenceId;
-    private static BusAddress busAddress;
+    private static Commander commander = null;
+    private static String conferenceId = "";
+    private static BusAddress busAddress = null;
 
     public static void main(String[] args) throws InterruptedException, IOException {
         logger.info("Data Bus 客户端单元初始化");
