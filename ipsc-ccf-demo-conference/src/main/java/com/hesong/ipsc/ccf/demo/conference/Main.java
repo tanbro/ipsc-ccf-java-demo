@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +72,7 @@ public class Main {
                                         params.put("max_seconds", 300);
                                         commander.operateResource(
                                                 busAddress,
-                                                UUID.randomUUID().toString(),
+                                                callId,
                                                 "sys.call.conf_enter",
                                                 params,
                                                 new RpcResultListener() {
