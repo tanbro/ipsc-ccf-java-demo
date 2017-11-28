@@ -6,12 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="ipsc-ccf-demo-conference" />
+        <module name="ipsc-ccf-java-demo" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="ipsc-ccf-demo-conference" target="1.6" />
-      <module name="ipsc-ccf-java-demo" target="1.6" />
+      <module name="ipsc-ccf-java-demo" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -33,11 +33,11 @@ public class Main {
             }
 
             public void connectFailed(Client client, int i) {
-                System.out.format("[{}] 连接失败", client.getId());
+                System.out.format("[%s] 连接失败", client.getId());
             }
 
             public void connectLost(Client client) {
-                System.out.format("[{}] 连接丢失", client.getId());
+                System.out.format("[%s] 连接丢失", client.getId());
             }
 
             public void globalConnectStateChanged(byte b, byte b1, byte b2, byte b3, String s) {
@@ -50,23 +50,25 @@ public class Main {
                 commanderId,
                 ipscIpAddr,
                 /// 事件监听器
-                new RpcEventListener() {
-                    public void onEvent(BusAddress busAddress, RpcRequest rpcRequest) {
-                        String fullMethodName = rpcRequest.getMethod();
-                        if (fullMethodName.startsWith("sys.call")) {
-                            /// 呼叫事件
-                            String methodName = fullMethodName.substring(9);
-                            final String callId = (String) rpcRequest.getParams().get("res_id");
-                            if (methodName.equals("on_released")) {
-                                logger.warn("呼叫 {} 已经释放", callId);
-                            } else if (methodName.equals("on_ringing")) {
-                                logger.info("呼叫 {} 振铃", callId);
-                            } else if (methodName.equals("on_dial_completed")) {
+                (busAddress, rpcRequest) -> {
+                    String fullMethodName = rpcRequest.getMethod();
+                    if (fullMethodName.startsWith("sys.call")) {
+                        /// 呼叫事件
+                        String methodName = fullMethodName.substring(9);
+                        final String callId = (String) rpcRequest.getParams().get("res_id");
+                        switch (methodName) {
+                            case "on_released":
+                                logger.warn("呼叫 %s 已经释放", callId);
+                                break;
+                            case "on_ringing":
+                                logger.info("呼叫 %s 振铃", callId);
+                                break;
+                            case "on_dial_completed":
                                 String error = (String) rpcRequest.getParams().get("error");
                                 if (error == null) {
-                                    logger.info("呼叫 {} 拨号成功，操作呼叫资源，让它加入会议 {} ...", callId, conferenceId);
+                                    logger.info("呼叫 %s 拨号成功，操作呼叫资源，让它加入会议 %s ...", callId, conferenceId);
                                     try {
-                                        Map<String, Object> params = new HashMap<String, Object>();
+                                        Map<String, Object> params = new HashMap<>();
                                         params.put("res_id", callId);
                                         params.put("conf_res_id", conferenceId);
                                         params.put("max_seconds", 300);
@@ -98,16 +100,16 @@ public class Main {
                                 } else {
                                     logger.error("呼叫 {} 拨号失败：{}", callId, error);
                                 }
-                            }
-                        } else if (fullMethodName.startsWith("sys.conf")) {
-                            /// 会议事件
-                            String methodName = fullMethodName.substring(9);
-                            String confId = (String) rpcRequest.getParams().get("res_id");
-                            if (methodName.equals("on_released")) {
-                                logger.warn("会议 {} 已经释放", confId);
-                                if (confId.equals(conferenceId)) {
-                                    conferenceId = "";
-                                }
+                                break;
+                        }
+                    } else if (fullMethodName.startsWith("sys.conf")) {
+                        /// 会议事件
+                        String methodName = fullMethodName.substring(9);
+                        String confId = (String) rpcRequest.getParams().get("res_id");
+                        if (methodName.equals("on_released")) {
+                            logger.warn("会议 {} 已经释放", confId);
+                            if (confId.equals(conferenceId)) {
+                                conferenceId = "";
                             }
                         }
                     }
@@ -121,13 +123,16 @@ public class Main {
                 "\t输入 \"call + <空格> + <电话号码>\" 呼叫该号码并在呼通后加入会议");
         while (true) {
             inputStr = scanner.nextLine().trim().toLowerCase();
-            if (inputStr.equals("conf")) {
+            if (inputStr.equals("quit")) {
+                break;
+            }
+            else if (inputStr.equals("conf")) {
                 if (!conferenceId.isEmpty()) {
                     logger.warn("这个DEMO就写了一个会议，别新建多个！");
                     continue;
                 }
                 logger.info("建立会议");
-                Map<String, Object> params = new HashMap<String, Object>();
+                Map<String, Object> params = new HashMap<>();
                 params.put("max_seconds", 300); /// 会议最长时间，这是必填参数
                 commander.createResource(
                         busAddress,
@@ -155,7 +160,7 @@ public class Main {
             } else if (inputStr.startsWith("call")) {
                 String tel = inputStr.substring(4).trim();
                 logger.info("呼叫 {}", tel);
-                Map<String, Object> params = new HashMap<String, Object>();
+                Map<String, Object> params = new HashMap<>();
                 params.put("to_uri", tel); /// 被叫号码的 SIP URI
                 params.put("max_answer_seconds", 300); /// 该呼叫最长通话允许时间
                 commander.createResource(

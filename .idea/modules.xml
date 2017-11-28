@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ipsc-ccf-demo-conference/ipsc-ccf-demo-conference.iml" filepath="$PROJECT_DIR$/ipsc-ccf-demo-conference/ipsc-ccf-demo-conference.iml" />
       <module fileurl="file://$PROJECT_DIR$/ipsc-ccf-java-demo.iml" filepath="$PROJECT_DIR$/ipsc-ccf-java-demo.iml" />
     </modules>
   </component>
