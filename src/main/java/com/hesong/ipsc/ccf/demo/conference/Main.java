@@ -28,8 +28,8 @@ public class Main {
         logger.info("Data Bus 客户端单元初始化");
         Unit.initiate(localId, new UnitCallbacks() {
             public void connectSucceed(Client client) {
-                logger.info("成功的连接到了IPSC服务程序的 Data Bus");
                 busAddress = new BusAddress(commander.getConnectingUnitId(), (byte) 0);
+                logger.info("成功的连接到了IPSC服务程序的 Data Bus. busAddress={}", busAddress);
             }
 
             public void connectFailed(Client client, int i) {
@@ -58,15 +58,15 @@ public class Main {
                         final String callId = (String) rpcRequest.getParams().get("res_id");
                         switch (methodName) {
                             case "on_released":
-                                logger.warn("呼叫 %s 已经释放", callId);
+                                logger.warn("呼叫 {} 已经释放", callId);
                                 break;
                             case "on_ringing":
-                                logger.info("呼叫 %s 振铃", callId);
+                                logger.info("呼叫 {} 振铃", callId);
                                 break;
                             case "on_dial_completed":
                                 String error = (String) rpcRequest.getParams().get("error");
                                 if (error == null) {
-                                    logger.info("呼叫 %s 拨号成功，操作呼叫资源，让它加入会议 %s ...", callId, conferenceId);
+                                    logger.info("呼叫 {} 拨号成功，操作呼叫资源，让它加入会议 {} ...", callId, conferenceId);
                                     try {
                                         Map<String, Object> params = new HashMap<>();
                                         params.put("res_id", callId);
