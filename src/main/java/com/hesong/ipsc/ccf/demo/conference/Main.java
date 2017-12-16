@@ -16,7 +16,7 @@ import com.hesong.ipsc.ccf.*;
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
-    private static final String ipscIpAddr = "192.168.2.100"; /// IPSC 服务器的内网地址
+    private static final String ipscIpAddr = "192.168.2.101"; /// IPSC 服务器的内网地址
     private static final byte localId = 24;
     private static final byte commanderId = 10;
 
