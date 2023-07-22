@@ -1,8 +1,6 @@
-# IPSC通用CTI流程的Java程序例子
+# IPSC 通用CTI低代码流程的 Java 程序调用 API 例子
 
-## 如何运行
-
-### 准备
+## 准备
 
 1. JDK
 1. Maven
@@ -10,36 +8,36 @@
 1. 按照 `ipsc-bus-client-java` 的 README 编译这个 JNI 库并生成jar包
 1. 按照 `ipsc-ccf-java` 的 README 生成jar包
 
-### 执行
+## 执行
 
-首先进入项目目录
+1. 首先进入项目目录
 
-```shell
-$ cd path/to/ipsc-bus-client-java
-```
+   ```sh
+   cd path/to/ipsc-bus-client-java-demo
+   ```
 
-#### 1. 安装依赖包
+1. 安装依赖包
 
-```shell
-$ mvn install
-```
+   ```sh
+   mvn install
+   ```
 
-#### 2. 编译
+1. 编译
 
-```shell
-$ mvn compile
-```
+   ```sh
+   mvn compile
+   ```
 
-#### 3. 设置 JNI 的库搜索路径
+1. 设置 JNI 的库搜索路径，例如:
 
-```shell
-$ export MAVEN_OPTS="-Djava.library.path=/usr/local/lib"
-```
+   ```sh
+   export MAVEN_OPTS="-Djava.library.path=/usr/local/lib"
+   ```
 
-#### 4. 执行
+1. 执行
 
-* 会议Demo的执行命令行是：
+   会议Demo的执行命令行是：
 
-```$shell
-$ mvn exec:java
-```
+   ```sh
+   mvn exec:java
+   ```
